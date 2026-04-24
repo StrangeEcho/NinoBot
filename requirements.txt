@@ -1,0 +1,5 @@
+discord.py[voice]
+jishaku
+pomice
+humanize
+async-cse
