@@ -1,17 +1,18 @@
-import discord
-from discord.ext import commands
-import wavelink
 from datetime import timedelta
+
+import discord
+import wavelink
+from discord.ext import commands
 
 from core import NinoBot, NinoContext
 from utils import Paginator, chunk_iter
-
 
 
 class NinoPlayer(wavelink.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queue = wavelink.Queue()
+
 
 class NinoTrackSelector(discord.ui.Select):
     def __init__(self, ctx: NinoContext, tracks: list[wavelink.Playable]):
@@ -29,18 +30,22 @@ class NinoTrackSelector(discord.ui.Select):
             )
 
         super().__init__(placeholder="Select a track", options=options)
-    
+
     def to_embed(self, content: str, embed_type: str) -> discord.Embed:
         return discord.Embed(
             description=content,
-            color=self.ctx.bot.ok_color if embed_type == "ok" else self.ctx.bot.error_color
+            color=(
+                self.ctx.bot.ok_color
+                if embed_type == "ok"
+                else self.ctx.bot.error_color
+            ),
         )
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
             return await interaction.response.send_message(
                 embed=self.to_embed("You are not able to use this menu", "error"),
-                ephemeral=True
+                ephemeral=True,
             )
 
         player: NinoPlayer = self.ctx.voice_client
@@ -48,16 +53,22 @@ class NinoTrackSelector(discord.ui.Select):
 
         if player.playing:
             player.queue.put(track)
-            await interaction.response.send_message(embed=self.to_embed(f"Queued: `{track.title}`", "ok"), delete_after=5)
+            await interaction.response.send_message(
+                embed=self.to_embed(f"Queued: `{track.title}`", "ok"), delete_after=5
+            )
         else:
             await player.play(track)
-            await interaction.response.send_message(embed=self.to_embed(f"Now playing: `{track.title}`", "ok"), delete_after=5)
+            await interaction.response.send_message(
+                embed=self.to_embed(f"Now playing: `{track.title}`", "ok"),
+                delete_after=5,
+            )
 
 
 class TrackSelectView(discord.ui.View):
     def __init__(self, ctx: NinoContext, tracks: list[wavelink.Playable]):
         super().__init__(timeout=30)
         self.add_item(NinoTrackSelector(ctx, tracks))
+
 
 class Music(commands.Cog):
     def __init__(self, bot: NinoBot):
@@ -95,7 +106,7 @@ class Music(commands.Cog):
 
         # Playlist
         if isinstance(tracks, wavelink.Playlist):
-            for t in tracks.tracks[:100]: # Max 100 songs out of the playlist
+            for t in tracks.tracks[:100]:  # Max 100 songs out of the playlist
                 player.queue.put(t)
 
             if not player.playing:
@@ -118,7 +129,7 @@ class Music(commands.Cog):
             embed=discord.Embed(
                 title="Multiple Results Found - Select From Below",
                 description=f"Search: `{query[:50]}`",
-                color=self.bot.ok_color
+                color=self.bot.ok_color,
             ).set_footer(text="Deleting selector after 30 seconds..."),
             delete_after=30,
             view=TrackSelectView(ctx, tracks),
@@ -206,9 +217,7 @@ class Music(commands.Cog):
         pages = [
             discord.Embed(
                 title=f"Queue Page {i}",
-                description="\n".join(
-                    f"{t.author} - {t.title}" for t in chunk
-                ),
+                description="\n".join(f"{t.author} - {t.title}" for t in chunk),
             )
             for i, chunk in enumerate(chunk_iter(player.queue, 10), 1)
         ]

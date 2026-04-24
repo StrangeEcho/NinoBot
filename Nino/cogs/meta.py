@@ -2,8 +2,9 @@ import platform
 import random
 
 import discord
-from core import NinoBot, NinoContext
 from discord.ext import commands
+
+from core import NinoBot, NinoContext
 
 
 class Meta(commands.Cog):
@@ -23,24 +24,20 @@ class Meta(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx: NinoContext):
         msg: discord.Message = await ctx.send("Measuring now...")
-        
-        msg_latency: float = round((msg.created_at - ctx.message.created_at).total_seconds() * 1000, 2)
+
+        msg_latency: float = round(
+            (msg.created_at - ctx.message.created_at).total_seconds() * 1000, 2
+        )
         ws_latency: float = round(self.bot.latency * 1000, 2)
-        
+
         await msg.edit(
             content="Finished Measuring...",
-            embed=discord.Embed(
-                title="Measured Latency",
-                color=discord.Color.green()
-            )
+            embed=discord.Embed(title="Measured Latency", color=discord.Color.green())
             .add_field(
                 name="Websocket / Gateway",
                 value=f"{ws_latency}ms",
             )
-            .add_field(
-                name="Message Latency",
-                value=f"{msg_latency}ms"
-            )
+            .add_field(name="Message Latency", value=f"{msg_latency}ms"),
         )
 
     @commands.command()
@@ -81,13 +78,12 @@ class Meta(commands.Cog):
                 inline=False,
             )
         )
-    
+
     @commands.command(aliases=["8ball"])
     async def eightball(self, ctx: NinoContext, *, question: str):
         responses = ["yes", "no", "maybe"]
         response = random.choice(responses)
         await ctx.send_ok(f"Question: {question}\nAnswer: {response}")
-
 
 
 async def setup(bot: NinoBot):

@@ -3,8 +3,9 @@ import logging
 from itertools import cycle
 
 import discord
-from core import NinoBot
 from discord.ext import commands, tasks
+
+from core import NinoBot
 
 
 class Tasks(commands.Cog):

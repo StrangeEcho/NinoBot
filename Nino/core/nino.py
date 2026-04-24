@@ -8,8 +8,10 @@ from typing import Any, Optional
 import discord
 import wavelink
 from discord.ext import commands
-from .context import NinoContext
+
 from utils import humanize_timedelta
+
+from .context import NinoContext
 
 
 class NinoConfigHandler:
@@ -40,7 +42,7 @@ class NinoBot(commands.AutoShardedBot):
         self.start_time = datetime.now()
         self.ok_color: int = int(self.config.get("ok_color"), 16)
         self.error_color: int = int(self.config.get("error_color"), 16)
-    
+
     async def on_message(self, message: discord.Message):
         ctx = await self.get_context(message, cls=NinoContext)
         await self.invoke(ctx)
@@ -49,10 +51,14 @@ class NinoBot(commands.AutoShardedBot):
         self.logger.info("Attempting Connection with Lavalink")
         self.nodes = [wavelink.Node(uri="http://127.0.0.1:2333", password="password1")]
         try:
-            await wavelink.Pool.connect(nodes=self.nodes, client=self, cache_capacity=100)
+            await wavelink.Pool.connect(
+                nodes=self.nodes, client=self, cache_capacity=100
+            )
             self.logger.info("wavelink connection... success")
         except Exception as e:
-            self.logger.error(f"wavelink connection... failure:\n{''.join(traceback.format_exception(e))}")
+            self.logger.error(
+                f"wavelink connection... failure:\n{''.join(traceback.format_exception(e))}"
+            )
 
     async def startup(self) -> None:
         """Startup method for the bot"""

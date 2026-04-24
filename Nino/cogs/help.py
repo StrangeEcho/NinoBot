@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord.ext import commands
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from core.nino import NinoBot
@@ -13,7 +15,7 @@ class NinoHelpCommand(commands.HelpCommand):
     async def send_bot_help(self, _):
         excluded = ["Jishaku", "Listeners", "Tasks", "Help"]
 
-        bot: NinoBot= self.context.bot
+        bot: NinoBot = self.context.bot
 
         await self.get_destination().send(
             embed=discord.Embed(
@@ -22,14 +24,12 @@ class NinoHelpCommand(commands.HelpCommand):
                     "I am a private music/utility bot based off the best anime series "
                     "in the world aka Quintissential Quintuplets. uhhhhhhh- and thats basically all"
                 ),
-                color=bot.ok_color
+                color=bot.ok_color,
             )
             .add_field(
                 name="Module List",
-                value="\n".join(
-                    f"`{cog}`" for cog in bot.cogs if cog not in excluded
-                ),
-                inline=False
+                value="\n".join(f"`{cog}`" for cog in bot.cogs if cog not in excluded),
+                inline=False,
             )
             .set_footer(
                 text=f"Use {self.context.clean_prefix}help <command/module>",
@@ -45,12 +45,13 @@ class NinoHelpCommand(commands.HelpCommand):
             embed=discord.Embed(
                 title=f"Module: `{cog.qualified_name}`",
                 description=cog.description or "No description provided.",
-                color=bot.ok_color
+                color=bot.ok_color,
             )
             .add_field(
                 name=f"Commands ({len(cog.get_commands())}):",
-                value=", ".join(f"`{cmd.name}`" for cmd in cog.get_commands()) or "None",
-                inline=False
+                value=", ".join(f"`{cmd.name}`" for cmd in cog.get_commands())
+                or "None",
+                inline=False,
             )
             .set_thumbnail(url=bot.user.display_avatar.url)
             .set_footer(
@@ -65,14 +66,10 @@ class NinoHelpCommand(commands.HelpCommand):
         embed = discord.Embed(
             title=f"Command: `{cmd.qualified_name}`",
             description=cmd.description or "No description provided.",
-            color=bot.ok_color
+            color=bot.ok_color,
         )
 
-        embed.add_field(
-            name="Module",
-            value=f"`{cmd.cog_name}`",
-            inline=False
-        )
+        embed.add_field(name="Module", value=f"`{cmd.cog_name}`", inline=False)
 
         # Cooldown
         if cmd._buckets and cmd._buckets._cooldown:
