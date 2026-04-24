@@ -1,5 +1,4 @@
 discord.py[voice]
 jishaku
-pomice
+wavelink
 humanize
-async-cse

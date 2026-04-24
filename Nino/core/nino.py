@@ -3,7 +3,7 @@ import os
 import tomllib
 import traceback
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import discord
 import wavelink
