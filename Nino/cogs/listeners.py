@@ -62,6 +62,9 @@ class Listeners(commands.Cog):
 
         if isinstance(e, commands.MissingRequiredArgument):
             msg = f"Missing required argument: `{e.param}`"
+        
+        if isinstance(e, commands.CommandNotFound):
+            pass
 
         else:
             msg = f"Unexpected Error Raised | Error Type: ***{e.__class__.__name__}***\nMessage:\n{e}"
