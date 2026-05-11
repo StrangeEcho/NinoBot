@@ -1,9 +1,8 @@
 import discord
 import wavelink
-from discord.ext import commands
-
 from core import NinoBot, NinoContext
-from utils import Paginator, chunk_iter
+from discord.ext import commands
+from utils import ButtonPaginator, chunk_iter
 
 
 class NinoPlayer(wavelink.Player):
@@ -220,7 +219,7 @@ class Music(commands.Cog):
             for i, chunk in enumerate(chunk_iter(player.queue, 10), 1)
         ]
 
-        paginator = Paginator(pages)
+        paginator = ButtonPaginator(pages)
         await paginator.start(ctx)
 
 

@@ -1,7 +1,9 @@
 from datetime import timedelta
-from typing import Any, Iterable
+from typing import Iterable, Iterator, Sequence, TypeVar
 
 import humanize
+
+T = TypeVar("T")
 
 
 def humanize_timedelta(td: timedelta, *, precise: bool = False) -> str:
@@ -11,7 +13,7 @@ def humanize_timedelta(td: timedelta, *, precise: bool = False) -> str:
     return humanize.naturaldelta(td)
 
 
-def chunk_iter(iterable: Iterable, chunk_size: int) -> list[list[Any]]:
+def chunk_iter(iterable: Iterable, chunk_size: int) -> Iterator[Sequence[T]]:
     """Chunk a list into smaller list by specified chunk size"""
     for i in range(0, len(iterable), chunk_size):
         yield iterable[i : i + chunk_size]

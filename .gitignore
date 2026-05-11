@@ -161,4 +161,4 @@ cython_debug/
 
 lavalink/application.yml
 lavalink/logs
-Totoro/core/config.toml
+Nino/core/config/config.toml

@@ -8,7 +8,6 @@ from typing import Any
 import discord
 import wavelink
 from discord.ext import commands
-
 from utils import humanize_timedelta
 
 from .context import NinoContext
@@ -49,7 +48,7 @@ class NinoBot(commands.AutoShardedBot):
 
     async def setup_hook(self) -> None:
         self.logger.info("Attempting Connection with Lavalink")
-        self.nodes = [wavelink.Node(uri="http://127.0.0.1:2333", password="password1")]
+        self.nodes = [wavelink.Node(uri="http://127.0.0.1:8080", password="password")]
         try:
             await wavelink.Pool.connect(
                 nodes=self.nodes, client=self, cache_capacity=100

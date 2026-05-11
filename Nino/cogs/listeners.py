@@ -1,10 +1,10 @@
 import logging
+import traceback
 from datetime import datetime, timezone
 
 import discord
-from discord.ext import commands
-
 from core import NinoBot
+from discord.ext import commands
 
 
 class Listeners(commands.Cog):
@@ -39,13 +39,13 @@ class Listeners(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context):
         self.listener_logger.info(f"""
----------------------------------------------
-    [{ctx.command.name}] Succesfully Executed
-    Guild: {ctx.guild.name} (ID: {ctx.guild.id})
-    Channel: {ctx.channel.name} (ID: {ctx.channel.id})
-    User/Member: {ctx.author.name} (ID: {ctx.author.id})\n
-    Usage: {ctx.message.content}
-    Execution Time: {round((datetime.now(timezone.utc) - ctx.message.created_at).total_seconds() * 1000, 2)}ms
+{ctx.clean_prefix}{ctx.command.name} - Succesfully Executed
+Guild: {ctx.guild.name} (ID: {ctx.guild.id})
+Channel: {ctx.channel.name} (ID: {ctx.channel.id})
+User/Member: {ctx.author.name} (ID: {ctx.author.id})\n
+Usage: {ctx.message.content}
+Execution Time: {round((datetime.now(timezone.utc) - ctx.message.created_at).total_seconds() * 1000, 2)}ms
+----------------------------------------------
         """)
 
     @commands.Cog.listener()
@@ -62,12 +62,13 @@ class Listeners(commands.Cog):
 
         if isinstance(e, commands.MissingRequiredArgument):
             msg = f"Missing required argument: `{e.param}`"
-        
+
         if isinstance(e, commands.CommandNotFound):
             pass
 
         else:
             msg = f"Unexpected Error Raised | Error Type: ***{e.__class__.__name__}***\nMessage:\n{e}"
+            self.listener_logger.error("".join(traceback.format_exception(e)))
             await self.forward_to_owners(ctx, e)
 
         await self.send_error(ctx, msg)
