@@ -182,7 +182,7 @@ class Music(commands.Cog):
         else:
             await ctx.send("No player connected.")
 
-    @commands.command(aliases=["np"])
+    @commands.command(aliases=["np", "currentplaying"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def nowplaying(self, ctx: NinoContext):
         player: NinoPlayer = ctx.voice_client
@@ -204,7 +204,7 @@ class Music(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(aliases=["listqueue", "songs"])
     async def queue(self, ctx: NinoContext):
         player: NinoPlayer = ctx.voice_client
 
@@ -213,9 +213,10 @@ class Music(commands.Cog):
 
         pages = [
             discord.Embed(
-                title=f"Queue Page {i}",
-                description="\n".join(f"{t.author} - {t.title}" for t in chunk),
-            )
+                title=f"{ctx.guild.name} Queue",
+                description="\n".join(f"`{i}. {t.title} - {t.author}`" for i, t in enumerate(chunk, 1)),
+                color=self.bot.ok_color
+            ).set_footer(text=f"Page {i}")
             for i, chunk in enumerate(chunk_iter(player.queue, 10), 1)
         ]
 

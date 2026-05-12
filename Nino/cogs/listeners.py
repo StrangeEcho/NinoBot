@@ -62,6 +62,9 @@ Execution Time: {round((datetime.now(timezone.utc) - ctx.message.created_at).tot
 
         if isinstance(e, commands.MissingRequiredArgument):
             msg = f"Missing required argument: `{e.param}`"
+            
+        if isinstance(e, commands.CommandOnCooldown):
+            msg = f"Command On Cooldown. Retry again after {e.retry_after}s"
 
         if isinstance(e, commands.CommandNotFound):
             pass
