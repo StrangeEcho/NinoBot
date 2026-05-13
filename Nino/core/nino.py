@@ -100,7 +100,7 @@ class NinoBot(commands.AutoShardedBot):
 
         self.nodes = [
             wavelink.Node(
-                uri="http://127.0.0.1:8080",
+                uri="http://127.0.0.1:2333",
                 password="password1",
             )
         ]
