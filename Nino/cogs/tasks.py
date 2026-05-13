@@ -66,7 +66,7 @@ class Tasks(commands.Cog):
 
         loading_panel = Panel.fit(
             (
-                "[bold yellow]Waiting for bot readiness...[/bold yellow]\n\n"
+                "[bold yellow]Waiting for On Ready[/bold yellow]\n\n"
                 "Activity cycler will start automatically."
             ),
             title="[bold white]Tasks",

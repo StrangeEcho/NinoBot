@@ -21,7 +21,7 @@ from .context import NinoContext
 # Rich Setup
 # =========================
 
-install(show_locals=True)
+install()
 
 console = Console()
 
@@ -102,7 +102,7 @@ class NinoBot(commands.AutoShardedBot):
         self.nodes = [
             wavelink.Node(
                 uri="http://127.0.0.1:8080",
-                password="password",
+                password="password1",
             )
         ]
 
