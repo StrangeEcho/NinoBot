@@ -47,17 +47,24 @@ class NinoBot(commands.AutoShardedBot):
         await self.invoke(ctx)
 
     async def setup_hook(self) -> None:
-        self.logger.info("Attempting Connection with Lavalink")
+        self.logger.info("Attempting Wavelink Connection with Lavalink")
         self.nodes = [wavelink.Node(uri="http://127.0.0.1:8080", password="password")]
         try:
             await wavelink.Pool.connect(
-                nodes=self.nodes, client=self, cache_capacity=100
+                nodes=self.nodes, client=self, cache_capacity=None
             )
             self.logger.info("wavelink connection... success")
         except Exception as e:
             self.logger.error(
-                f"wavelink connection... failure:\n{''.join(traceback.format_exception(e))}"
+                f"wavelink connection... failed:\n{''.join(traceback.format_exception(e))}"
             )
+        self.logger.info("Attempting Command Tree Sync")
+        try:
+            await self.tree.sync()
+            self.logger.info("command tree sync... success")
+            self.logger.info(f"synced commands: {len(self.tree.get_commands())}")
+        except Exception as e:
+            self.logger.error(f"command tree sync... failed:\n{''.join(traceback.format_exception(e))}")
 
     async def startup(self) -> None:
         """Startup method for the bot"""
@@ -79,7 +86,7 @@ class NinoBot(commands.AutoShardedBot):
                     )
 
     async def close(self):
-        run_time = humanize_timedelta(datetime.now() - self.start_time)
+        run_time = humanize_timedelta(datetime.now() - self.start_time, precise=True)
         await wavelink.Pool.close()
         self.logger.info("Closed Wavelink Node Pool")
         self.logger.info(f"Shutting down Nino now... (Run Time: {run_time})")

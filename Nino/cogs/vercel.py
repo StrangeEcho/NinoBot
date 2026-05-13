@@ -13,7 +13,7 @@ class Vercel(commands.Cog):
             self.bot.config.get("vercel_token")
         )
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.is_owner()
     async def projectlist(self, ctx: NinoContext):
         """Recieve Information about current Vercel projects"""

@@ -1,8 +1,10 @@
 import platform
 import random
+from datetime import datetime
 
 import discord
 from core import NinoBot, NinoContext
+from utils import humanize_timedelta
 from discord.ext import commands
 
 
@@ -12,16 +14,17 @@ class Meta(commands.Cog):
     def __init__(self, bot: NinoBot):
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.is_owner()
     async def logout(self, ctx: NinoContext):
         """Logout/Close the bot process"""
         await ctx.send("Logging out now...")
         await self.bot.close()
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx: NinoContext):
+        """Return back bots message and websocket latency"""
         msg: discord.Message = await ctx.send("Measuring now...")
 
         msg_latency: float = round(
@@ -39,15 +42,15 @@ class Meta(commands.Cog):
             .add_field(name="Message Latency", value=f"{msg_latency}ms"),
         )
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def info(self, ctx: NinoContext):
-        """Information about the bot itself"""
+        """Information about the bot"""
         await ctx.send(
             embed=discord.Embed(
                 title="Hi again! Heres sum info about me",
                 description="First and foremost [this](https://github.com/StrangeEcho/NinoBot) right here is my source code",
-                color=discord.Color.green(),
+                color=self.bot.ok_color,
             )
             .set_thumbnail(url=self.bot.user.display_avatar.url)
             .set_footer(
@@ -59,7 +62,7 @@ class Meta(commands.Cog):
                 value=f"Guilds: {len(self.bot.guilds)} | Users: {len(self.bot.users)}",
             )
             .add_field(
-                name="Uptime", value=discord.utils.format_dt(self.bot.start_time, "R")
+                name="Uptime", value=discord.utils.format_dt(self.bot.start_time, "T")
             )
             .add_field(
                 name="Owner(s)",
@@ -78,11 +81,12 @@ class Meta(commands.Cog):
             )
         )
 
-    @commands.command(aliases=["8ball"])
-    async def eightball(self, ctx: NinoContext, *, question: str):
-        responses = ["yes", "no", "maybe"]
-        response = random.choice(responses)
-        await ctx.send_ok(f"Question: {question}\nAnswer: {response}")
+    @commands.hybrid_command()
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def uptime(self, ctx: NinoContext):
+        """Return the bots current uptime since startup"""
+        uptime = humanize_timedelta(datetime.now() - self.bot.start_time, precise=True)
+        await ctx.send_ok(f"Current Uptime: `{uptime}`")
 
 
 async def setup(bot: NinoBot):

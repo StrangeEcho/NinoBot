@@ -71,9 +71,10 @@ class Music(commands.Cog):
     def __init__(self, bot: NinoBot):
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def connect(self, ctx: NinoContext):
+        """Connect the bot's music player to the command author's VC"""
         if not ctx.author.voice:
             return await ctx.send_error("You must be in a voice channel.")
 
@@ -85,9 +86,13 @@ class Music(commands.Cog):
 
         await ctx.send_ok(f"Joined `{channel.name}`")
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def play(self, ctx: NinoContext, *, query: str):
+        """
+        Looks up a song with a given query and returns back 5 results (max). 
+        Multiple songs can be played out the same drop down
+        """
         if not ctx.author.voice:
             return await ctx.send_error("You must be in a voice channel.")
 
@@ -132,9 +137,10 @@ class Music(commands.Cog):
             view=TrackSelectView(ctx, tracks),
         )
 
-    @commands.command(aliases=["next"])
+    @commands.hybrid_command(aliases=["next"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def skip(self, ctx: NinoContext):
+        """Skip the current song (if any) and goes to the next."""
         player: NinoPlayer = ctx.voice_client
 
         if not player:
@@ -147,9 +153,10 @@ class Music(commands.Cog):
             await player.play(next_track)
             await ctx.send_ok(f"Now playing: `{next_track.title}`.")
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def pause(self, ctx: NinoContext):
+        """Pause the current song in the music player"""
         player: NinoPlayer = ctx.voice_client
 
         if not player:
@@ -158,9 +165,10 @@ class Music(commands.Cog):
         await player.pause(not player.paused)
         await ctx.send_ok("Toggled pause.")
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def volume(self, ctx: NinoContext, volume: int):
+        """Adjust the music players volume"""
         player: NinoPlayer = ctx.voice_client
 
         if not player:
@@ -172,9 +180,10 @@ class Music(commands.Cog):
         await player.set_volume(volume)
         await ctx.send(f"Volume set to `{self.volume}`")
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def disconnect(self, ctx):
+        """Disconnects the music player from VC"""
         player: NinoPlayer = ctx.voice_client
 
         if player:
@@ -182,9 +191,10 @@ class Music(commands.Cog):
         else:
             await ctx.send("No player connected.")
 
-    @commands.command(aliases=["np", "currentplaying"])
+    @commands.hybrid_command(aliases=["np", "currentplaying"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def nowplaying(self, ctx: NinoContext):
+        """Returns the current song"""
         player: NinoPlayer = ctx.voice_client
 
         if not player or not player.current:
@@ -204,8 +214,9 @@ class Music(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["listqueue", "songs"])
+    @commands.hybrid_command(aliases=["listqueue", "songs"])
     async def queue(self, ctx: NinoContext):
+        """Returns a list back of the songs in queue"""
         player: NinoPlayer = ctx.voice_client
 
         if not player or not player.queue:
@@ -217,7 +228,7 @@ class Music(commands.Cog):
                 description="\n".join(f"`{i}. {t.title} - {t.author}`" for i, t in enumerate(chunk, 1)),
                 color=self.bot.ok_color
             ).set_footer(text=f"Page {i}")
-            for i, chunk in enumerate(chunk_iter(player.queue, 10), 1)
+            for i, chunk in enumerate(discord.utils.as_chunks(player.queue, 10), 1)
         ]
 
         paginator = ButtonPaginator(pages)

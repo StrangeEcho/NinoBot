@@ -9,7 +9,7 @@ T = TypeVar("T")
 def humanize_timedelta(td: timedelta, *, precise: bool = False) -> str:
     """Humanize a timedelta into human readable text"""
     if precise:
-        return humanize.precisedelta(td)
+        return humanize.precisedelta(td, minimum_unit="seconds")
     return humanize.naturaldelta(td)
 
 
