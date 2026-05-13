@@ -2,3 +2,4 @@ discord.py[voice]
 jishaku
 wavelink
 humanize
+rich

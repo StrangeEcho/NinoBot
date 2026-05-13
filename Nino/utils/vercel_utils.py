@@ -102,7 +102,7 @@ class VercelClient:
                         is_live=(
                             latest is not None and latest.get("readyState") == "READY"
                         ),
-                    )    
+                    )
                 )
             await session.close()
             return projects

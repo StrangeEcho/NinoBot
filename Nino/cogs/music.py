@@ -90,7 +90,7 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def play(self, ctx: NinoContext, *, query: str):
         """
-        Looks up a song with a given query and returns back 5 results (max). 
+        Looks up a song with a given query and returns back 5 results (max).
         Multiple songs can be played out the same drop down
         """
         if not ctx.author.voice:
@@ -225,8 +225,10 @@ class Music(commands.Cog):
         pages = [
             discord.Embed(
                 title=f"{ctx.guild.name} Queue",
-                description="\n".join(f"`{i}. {t.title} - {t.author}`" for i, t in enumerate(chunk, 1)),
-                color=self.bot.ok_color
+                description="\n".join(
+                    f"`{i}. {t.title} - {t.author}`" for i, t in enumerate(chunk, 1)
+                ),
+                color=self.bot.ok_color,
             ).set_footer(text=f"Page {i}")
             for i, chunk in enumerate(discord.utils.as_chunks(player.queue, 10), 1)
         ]
