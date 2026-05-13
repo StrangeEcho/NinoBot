@@ -40,7 +40,6 @@ handler = RichHandler(
 discord.utils.setup_logging(
     level=logging.INFO,
     handler=handler,
-    formatter=logging.Formatter(LOG_FORMAT),
     root=True,
 )
 
