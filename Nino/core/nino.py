@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import tomllib
@@ -17,10 +18,7 @@ from utils import humanize_timedelta
 
 from .context import NinoContext
 
-# =========================
 # Rich Setup
-# =========================
-
 install()
 
 console = Console()
@@ -40,6 +38,7 @@ handler = RichHandler(
 discord.utils.setup_logging(
     level=logging.INFO,
     handler=handler,
+    formatter=logging.Formatter(LOG_FORMAT),
     root=True,
 )
 
@@ -85,17 +84,6 @@ class NinoBot(commands.AutoShardedBot):
         await self.invoke(ctx)
 
     async def setup_hook(self) -> None:
-        console.print(
-            Rule(
-                "[bold purple]Nino Startup Sequence",
-                style="purple",
-            )
-        )
-
-        # =========================
-        # Lavalink Connection
-        # =========================
-
         self.logger.info("[bold cyan]Connecting to Lavalink...")
 
         self.nodes = [
@@ -121,10 +109,6 @@ class NinoBot(commands.AutoShardedBot):
 
         except Exception:
             self.logger.exception("[bold red]Failed to connect to Lavalink")
-
-        # =========================
-        # Command Tree Sync
-        # =========================
 
         self.logger.info("[bold cyan]Syncing command tree...")
 
@@ -159,6 +143,12 @@ class NinoBot(commands.AutoShardedBot):
         )
 
         await self._load_extensions()
+        console.print(
+            Rule(
+                "[bold purple]The Start of Something New",
+                style="purple",
+            )
+        )
         await self.start(self.config.get("token"))
 
     async def _load_extensions(self) -> None:
@@ -199,13 +189,33 @@ class NinoBot(commands.AutoShardedBot):
             )
         )
 
-    async def close(self):
+    async def restart(self):
+        """Calls normal Bot.close() to restart because of Systemd keeping the process alive"""
         run_time = humanize_timedelta(
             datetime.now() - self.start_time,
             precise=True,
         )
 
         await wavelink.Pool.close()
+
+        console.print(
+            Panel.fit(
+                (
+                    "[bold red]Nino restart now[/bold red]\n\n"
+                    f"Runtime: [bold white]{run_time}[/bold white]"
+                ),
+                border_style="red",
+            )
+        )
+
+        await super().close()  # Systemd will wake the process backup
+
+    async def shutdown(self):
+        """True shutdown. Manual cleanup of bot proccess with 0 exit code"""
+        run_time = humanize_timedelta(
+            datetime.now() - self.start_time,
+            precise=True,
+        )
 
         console.print(
             Panel.fit(
@@ -217,7 +227,17 @@ class NinoBot(commands.AutoShardedBot):
             )
         )
 
-        await super().close()
+        for cog in self.cogs.values():  # Attempt to unload all cogs
+            try:
+                await cog.cog_unload()
+            except:
+                pass
+        if self.ws and self.ws.open:  # Close WS connection
+            await self.ws.close(1000)
+        await wavelink.Pool.close()
+
+        await self.http.close()
+        exit(0)
 
     async def on_ready(self):
         console.print(

@@ -16,10 +16,17 @@ class Meta(commands.Cog):
 
     @commands.hybrid_command()
     @commands.is_owner()
-    async def logout(self, ctx: NinoContext):
-        """Logout/Close the bot process"""
-        await ctx.send("Logging out now...")
-        await self.bot.close()
+    async def restart(self, ctx: NinoContext):
+        """Restart the bot process. May not work (Systemd needed)"""
+        await ctx.send("Hopefully ill be back. Who knows.")
+        await self.bot.restart()
+
+    @commands.hybrid_command()
+    @commands.is_owner()
+    async def shutdown(self, ctx: NinoContext):
+        """Intentional shutdown despite Systemd with manual cleanup"""
+        await ctx.send("See ya later.")
+        await self.bot.shutdown()
 
     @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
