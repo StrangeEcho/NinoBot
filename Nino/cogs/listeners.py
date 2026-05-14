@@ -1,5 +1,7 @@
 import logging
+import traceback
 from datetime import datetime, timezone
+from io import BytesIO
 
 import discord
 from core import NinoBot
@@ -40,6 +42,9 @@ class Listeners(commands.Cog):
 
             if not owner:
                 continue
+            full_error = "".join(traceback.format_exception(e))
+            file_data = BytesIO(full_error.encode())
+            file = discord.File(file_data, filename="error.txt")
 
             try:
                 embed = discord.Embed(
@@ -61,7 +66,7 @@ class Listeners(commands.Cog):
                     inline=False,
                 )
 
-                await owner.send(embed=embed)
+                await owner.send(embed=embed, file=file)
 
             except (discord.Forbidden, discord.HTTPException):
                 self.listener_logger.exception("Failed to forward error to bot owner")
